@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Unit Inspection Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .location-options {
+            margin-top: 10px;
+        }
+        .location-option {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #violationList {
+            margin-top: 20px;
+        }
+        .violation-item {
+            background: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #4CAF50;
+        }
+        .remove-violation {
+            color: #e74c3c;
+            cursor: pointer;
+            float: right;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>External Unit Inspection Form</h1>
+        
+        <div class="form-group">
+            <label for="unitNumber">Unit Number/Identifier:</label>
+            <input type="text" id="unitNumber" name="unitNumber" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="inspectorName">Inspector Name:</label>
+            <input type="text" id="inspectorName" name="inspectorName" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="inspectionDate">Inspection Date:</label>
+            <input type="date" id="inspectionDate" name="inspectionDate" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="violationSearch">Add Violation:</label>
+            <select id="violationSearch" class="violation-search" style="width: 100%">
+                <option></option>
+                <!-- Options will be populated by JavaScript -->
+            </select>
+        </div>
+        
+        <div class="form-group location-options hidden" id="locationOptions">
+            <label>Violation Location:</label>
+            <div class="location-option">
+                <input type="radio" id="front" name="violationLocation" value="Front">
+                <label for="front">Front of unit</label>
+            </div>
+            <div class="location-option">
+                <input type="radio" id="rear" name="violationLocation" value="Rear">
+                <label for="rear">Rear of unit</label>
+            </div>
+            <div class="location-option">
+                <input type="radio" id="side" name="violationLocation" value="Side">
+                <label for="side">Side of unit</label>
+            </div>
+            <div class="location-option">
+                <input type="radio" id="frontRear" name="violationLocation" value="Front and Rear">
+                <label for="frontRear">Front and rear of unit</label>
+            </div>
+            <button type="button" id="addViolationBtn">Add Violation</button>
+        </div>
+        
+        <div id="violationList">
+            <h3>Reported Violations:</h3>
+            <div id="violationsContainer"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">Additional Notes:</label>
+            <textarea id="notes" name="notes" rows="4"></textarea>
+        </div>
+        
+        <button type="button" id="generateReportBtn">Generate Inspection Report (Word)</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.1.0/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <script>
+        // Sample violation data - replace with your actual database data
+        const violationsDatabase = [
+            { name: "Broken Headlight", shortName: "HL-BRK", frontText: "Broken headlight on front", rearText: "N/A", sideText: "N/A", frontRearText: "Broken headlights on front and rear" },
+            { name: "Damaged Bumper", shortName: "BMP-DMG", frontText: "Damaged front bumper", rearText: "Damaged rear bumper", sideText: "N/A", frontRearText: "Damaged bumpers on front and rear" },
+            { name: "Missing Mirror", shortName: "MIR-MISS", frontText: "N/A", rearText: "N/A", sideText: "Missing side mirror", frontRearText: "N/A" },
+            { name: "Tire Wear", shortName: "TIR-WEAR", frontText: "Excessive wear on front tires", rearText: "Excessive wear on rear tires", sideText: "N/A", frontRearText: "Excessive wear on front and rear tires" },
+            { name: "Body Damage", shortName: "BDY-DMG", frontText: "Body damage on front", rearText: "Body damage on rear", sideText: "Body damage on side", frontRearText: "Body damage on front and rear" }
+        ];
+
+        // Initialize Select2 for violation search
+        $(document).ready(function() {
+            // Populate the violation search dropdown
+            $('#violationSearch').select2({
+                placeholder: "Search for a violation...",
+                data: violationsDatabase.map(violation => ({
+                    id: violation.name,
+                    text: violation.name
+                }))
+            });
+
+            // Show location options when a violation is selected
+            $('#violationSearch').on('select2:select', function(e) {
+                $('#locationOptions').removeClass('hidden');
+            });
+
+            // Array to store added violations
+            let addedViolations = [];
+
+            // Add violation to the list
+            $('#addViolationBtn').click(function() {
+                const selectedViolationName = $('#violationSearch').val();
+                const selectedLocation = $('input[name="violationLocation"]:checked').val();
+                
+                if (!selectedViolationName || !selectedLocation) {
+                    alert('Please select both a violation and a location');
+                    return;
+                }
+
+                // Find the full violation data
+                const violation = violationsDatabase.find(v => v.name === selectedViolationName);
+                
+                // Determine the violation text based on location
+                let violationText = '';
+                switch(selectedLocation) {
+                    case 'Front':
+                        violationText = violation.frontText;
+                        break;
+                    case 'Rear':
+                        violationText = violation.rearText;
+                        break;
+                    case 'Side':
+                        violationText = violation.sideText;
+                        break;
+                    case 'Front and Rear':
+                        violationText = violation.frontRearText;
+                        break;
+                }
+
+                // Add to the violations array
+                addedViolations.push({
+                    name: violation.name,
+                    shortName: violation.shortName,
+                    location: selectedLocation,
+                    text: violationText
+                });
+
+                // Update the violations list display
+                updateViolationsList();
+
+                // Reset the form
+                $('#violationSearch').val(null).trigger('change');
+                $('#locationOptions').addClass('hidden');
+                $('input[name="violationLocation"]').prop('checked', false);
+            });
+
+            // Update the violations list display
+            function updateViolationsList() {
+                const container = $('#violationsContainer');
+                container.empty();
+                
+                if (addedViolations.length === 0) {
+                    container.html('<p>No violations added yet.</p>');
+                    return;
+                }
+                
+                addedViolations.forEach((violation, index) => {
+                    const item = $(`
+                        <div class="violation-item">
+                            <strong>${violation.name}</strong> (${violation.shortName})
+                            <br>Location: ${violation.location}
+                            <br>Description: ${violation.text}
+                            <span class="remove-violation" data-index="${index}">✕ Remove</span>
+                        </div>
+                    `);
+                    container.append(item);
+                });
+                
+                // Add click handler for remove buttons
+                $('.remove-violation').click(function() {
+                    const index = $(this).data('index');
+                    addedViolations.splice(index, 1);
+                    updateViolationsList();
+                });
+            }
+
+            // Generate Word document
+            $('#generateReportBtn').click(function() {
+                if (addedViolations.length === 0) {
+                    alert('Please add at least one violation before generating the report');
+                    return;
+                }
+
+                const { Document, Paragraph, TextRun, HeadingLevel, Packer } = docx;
+                
+                // Create document content
+                const doc = new Document({
+                    sections: [{
+                        properties: {},
+                        children: [
+                            new Paragraph({
+                                text: "External Unit Inspection Report",
+                                heading: HeadingLevel.HEADING_1,
+                                alignment: "center"
+                            }),
+                            new Paragraph({
+                                text: `Unit Number: ${$('#unitNumber').val()}`,
+                                spacing: { after: 200 }
+                            }),
+                            new Paragraph({
+                                text: `Inspector: ${$('#inspectorName').val()}`,
+                                spacing: { after: 200 }
+                            }),
+                            new Paragraph({
+                                text: `Inspection Date: ${$('#inspectionDate').val()}`,
+                                spacing: { after: 400 }
+                            }),
+                            new Paragraph({
+                                text: "Reported Violations:",
+                                heading: HeadingLevel.HEADING_2,
+                                spacing: { after: 200 }
+                            }),
+                            ...addedViolations.flatMap(violation => [
+                                new Paragraph({
+                                    text: `${violation.name} (${violation.shortName})`,
+                                    bullet: { level: 0 }
+                                }),
+                                new Paragraph({
+                                    text: `Location: ${violation.location}`,
+                                    indent: { left: 720 } // 0.5 inch indent
+                                }),
+                                new Paragraph({
+                                    text: `Description: ${violation.text}`,
+                                    indent: { left: 720 },
+                                    spacing: { after: 200 }
+                                })
+                            ]),
+                            new Paragraph({
+                                text: "Additional Notes:",
+                                heading: HeadingLevel.HEADING_2,
+                                spacing: { before: 400, after: 200 }
+                            }),
+                            new Paragraph({
+                                text: $('#notes').val() || "None",
+                                spacing: { after: 400 }
+                            }),
+                            new Paragraph({
+                                text: "Inspector Signature: ___________________________",
+                                spacing: { before: 800 }
+                            })
+                        ]
+                    }]
+                });
+
+                // Generate and download the document
+                Packer.toBlob(doc).then(blob => {
+                    saveAs(blob, `Inspection_Report_${$('#unitNumber').val()}.docx`);
+                });
+            });
+
+            // Initialize with empty violations list
+            updateViolationsList();
+        });
+    </script>
+</body>
+</html>
