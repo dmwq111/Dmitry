@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Inspection Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+        }
+        .section {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .violation-item {
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .violation-text {
+            flex: 1;
+            min-width: 200px;
+        }
+        .violation-location {
+            flex: 1;
+            min-width: 150px;
+        }
+        .remove-violation {
+            color: red;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .location-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .location-option {
+            display: flex;
+            align-items: center;
+        }
+        .location-option input {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>House Inspection Form</h1>
+    <form id="inspectionForm">
+        <div class="section">
+            <h2 class="section-title">Property Information</h2>
+            <div class="form-group">
+                <label for="propertyAddress">Property Address</label>
+                <input type="text" id="propertyAddress" name="propertyAddress" required>
+            </div>
+            <div class="form-group">
+                <label for="ownerName">Owner Name</label>
+                <input type="text" id="ownerName" name="ownerName">
+            </div>
+            <div class="form-group">
+                <label for="inspectionDate">Inspection Date</label>
+                <input type="date" id="inspectionDate" name="inspectionDate" required>
+            </div>
+            <div class="form-group">
+                <label for="inspectorName">Inspector Name</label>
+                <input type="text" id="inspectorName" name="inspectorName" required>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Inspection Details</h2>
+            <div class="form-group">
+                <label for="violations">Add Violation</label>
+                <select id="violations" class="violation-select" style="width: 100%">
+                    <option value=""></option>
+                    <option value="Structural damage">Structural damage</option>
+                    <option value="Roof leaks or damage">Roof leaks or damage</option>
+                    <option value="Faulty electrical wiring">Faulty electrical wiring</option>
+                    <option value="Plumbing leaks">Plumbing leaks</option>
+                    <option value="Mold growth">Mold growth</option>
+                    <option value="Pest infestation">Pest infestation</option>
+                    <option value="Broken windows">Broken windows</option>
+                    <option value="Non-functioning HVAC">Non-functioning HVAC</option>
+                    <option value="Missing smoke detectors">Missing smoke detectors</option>
+                    <option value="Missing carbon monoxide detectors">Missing carbon monoxide detectors</option>
+                    <option value="Peeling lead paint">Peeling lead paint</option>
+                    <option value="Inadequate ventilation">Inadequate ventilation</option>
+                    <option value="Blocked emergency exits">Blocked emergency exits</option>
+                    <option value="Unsafe stairs or railings">Unsafe stairs or railings</option>
+                    <option value="Water damage">Water damage</option>
+                    <option value="Foundation cracks">Foundation cracks</option>
+                    <option value="Improper waste disposal">Improper waste disposal</option>
+                    <option value="Overgrown vegetation">Overgrown vegetation</option>
+                    <option value="Broken or missing handrails">Broken or missing handrails</option>
+                    <option value="Inoperable appliances">Inoperable appliances</option>
+                    <option value="Other (specify in notes)">Other (specify in notes)</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="locationSelection" style="display: none;">
+                <label>Select Location(s) of Violation:</label>
+                <div class="location-options">
+                    <div class="location-option">
+                        <input type="checkbox" id="frontLocation" name="location" value="Front of the unit">
+                        <label for="frontLocation">Front of the unit</label>
+                    </div>
+                    <div class="location-option">
+                        <input type="checkbox" id="backLocation" name="location" value="Back of the unit">
+                        <label for="backLocation">Back of the unit</label>
+                    </div>
+                    <div class="location-option">
+                        <input type="checkbox" id="sideLocation" name="location" value="Side of the unit">
+                        <label for="sideLocation">Side of the unit</label>
+                    </div>
+                    <div class="location-option">
+                        <input type="checkbox" id="interiorLocation" name="location" value="Interior">
+                        <label for="interiorLocation">Interior</label>
+                    </div>
+                    <div class="location-option">
+                        <input type="checkbox" id="roofLocation" name="location" value="Roof">
+                        <label for="roofLocation">Roof</label>
+                    </div>
+                    <div class="location-option">
+                        <input type="checkbox" id="basementLocation" name="location" value="Basement">
+                        <label for="basementLocation">Basement</label>
+                    </div>
+                </div>
+                <button type="button" id="addViolationBtn" style="margin-top: 10px;">Add Violation with Location</button>
+            </div>
+            
+            <div id="violationsList">
+                <!-- Violations will be added here -->
+            </div>
+            
+            <div class="form-group">
+                <label for="violationNotes">Violation Notes</label>
+                <textarea id="violationNotes" name="violationNotes" placeholder="Add details about violations found..."></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Inspection Results</h2>
+            <div class="form-group">
+                <label for="inspectionResult">Overall Inspection Result</label>
+                <select id="inspectionResult" name="inspectionResult" required>
+                    <option value="">Select result</option>
+                    <option value="Passed">Passed</option>
+                    <option value="Failed">Failed</option>
+                    <option value="Conditional Pass">Conditional Pass</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="followUpDate">Follow-up Date (if applicable)</label>
+                <input type="date" id="followUpDate" name="followUpDate">
+            </div>
+            <div class="form-group">
+                <label for="additionalNotes">Additional Notes</label>
+                <textarea id="additionalNotes" name="additionalNotes" placeholder="Add any additional notes about the inspection..."></textarea>
+            </div>
+        </div>
+
+        <button type="submit">Submit Inspection Report</button>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize select2 for the violations dropdown
+            $('.violation-select').select2({
+                placeholder: "Search or select a violation",
+                allowClear: true
+            });
+
+            // Show location selection when a violation is chosen
+            $('#violations').on('change', function() {
+                const violation = $(this).val();
+                if (violation) {
+                    $('#locationSelection').show();
+                } else {
+                    $('#locationSelection').hide();
+                }
+            });
+
+            // Add violation to the list with locations
+            $('#addViolationBtn').on('click', function() {
+                const violation = $('#violations').val();
+                const selectedLocations = [];
+                
+                $('input[name="location"]:checked').each(function() {
+                    selectedLocations.push($(this).val());
+                });
+                
+                if (violation && selectedLocations.length > 0) {
+                    const locationsText = selectedLocations.join(', ');
+                    
+                    $('#violationsList').append(`
+                        <div class="violation-item">
+                            <div class="violation-text">${violation}</div>
+                            <div class="violation-location">Location: ${locationsText}</div>
+                            <span class="remove-violation">×</span>
+                            <input type="hidden" name="selectedViolations[]" value="${violation}">
+                            <input type="hidden" name="violationLocations[]" value="${locationsText}">
+                        </div>
+                    `);
+                    
+                    // Reset the form
+                    $('#violations').val(null).trigger('change');
+                    $('input[name="location"]').prop('checked', false);
+                    $('#locationSelection').hide();
+                } else {
+                    alert('Please select at least one location for the violation.');
+                }
+            });
+
+            // Remove violation from the list
+            $(document).on('click', '.remove-violation', function() {
+                $(this).parent().remove();
+            });
+
+            // Form submission
+            $('#inspectionForm').on('submit', function(e) {
+                e.preventDefault();
+                alert('Inspection form submitted successfully!');
+                // Here you would typically send the form data to a server
+                // this.submit();
+            });
+        });
+    </script>
+</body>
+</html>
