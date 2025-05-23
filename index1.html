@@ -326,6 +326,61 @@
                 });
             });
 
+
+function generateDoc() {
+            // Get form values
+            const name = document.getElementById('name').value || 'Unknown';
+            const department = document.getElementById('department').value;
+            const priority = document.getElementById('priority').value;
+
+            // Create a new Document
+            const doc = new docx.Document({
+                sections: [{
+                    properties: {},
+                    children: [
+                        new docx.Paragraph({
+                            children: [
+                                new docx.TextRun({
+                                    text: "Generated Document",
+                                    bold: true,
+                                    size: 24
+                                })
+                            ]
+                        }),
+                        new docx.Paragraph({
+                            children: [
+                                new docx.TextRun({
+                                    text: `Name: ${name}`,
+                                    size: 20
+                                })
+                            ]
+                        }),
+                        new docx.Paragraph({
+                            children: [
+                                new docx.TextRun({
+                                    text: `Department: ${department}`,
+                                    size: 20
+                                })
+                            ]
+                        }),
+                        new docx.Paragraph({
+                            children: [
+                                new docx.TextRun({
+                                    text: `Priority Level: ${priority}`,
+                                    size: 20
+                                })
+                            ]
+                        })
+                    ]
+                }]
+            });
+
+            // Generate and download the Word document
+            docx.Packer.toBlob(doc).then(blob => {
+                saveAs(blob, "Generated_Document.docx");
+            });
+
+            
             // Initialize with empty violations list
             updateViolationsList();
         });
