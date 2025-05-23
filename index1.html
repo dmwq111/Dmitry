@@ -115,6 +115,11 @@
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">External Unit Inspection</h1>
 
         <div class="mb-6">
+            <label for="unitNumber" class="form-group label">Unit Number:</label>
+            <input type="text" id="unitNumber" class="form-input" placeholder="e.g., A-101, 123 Main St.">
+        </div>
+
+        <div class="mb-6">
             <label for="violationSearch" class="form-group label">Search Violation:</label>
             <input type="text" id="violationSearch" class="form-input" placeholder="Type to search violations..." list="violationsList">
             <datalist id="violationsList"></datalist>
@@ -250,6 +255,7 @@
         ];
 
         // Get DOM elements
+        const unitNumberInput = document.getElementById('unitNumber'); // New: Unit Number input
         const violationSearchInput = document.getElementById('violationSearch');
         const violationsDatalist = document.getElementById('violationsList');
         const addViolationBtn = document.getElementById('addViolationBtn');
@@ -369,6 +375,8 @@
          * Generates and downloads the Word document.
          */
         generateDocBtn.addEventListener('click', () => {
+            const unitNumber = unitNumberInput.value.trim(); // Get unit number
+
             if (selectedViolations.length === 0) {
                 alertUser("No violations added to generate a document.");
                 return;
@@ -384,6 +392,7 @@
                         h1 { color: #333; text-align: center; margin-bottom: 30px; }
                         h2 { color: #555; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 25px; }
                         p { margin-bottom: 10px; line-height: 1.6; }
+                        .unit-info { font-size: 1.2em; text-align: center; margin-bottom: 20px; color: #4f46e5; font-weight: bold; }
                         .violation-section { margin-bottom: 20px; padding: 15px; border: 1px solid #eee; border-radius: 8px; background-color: #f9f9f9; }
                         .violation-name { font-weight: bold; font-size: 1.1em; color: #4f46e5; }
                         .violation-location { font-style: italic; color: #666; margin-top: 5px; }
@@ -393,6 +402,14 @@
                 <body>
                     <h1>Unit External Inspection Report</h1>
             `;
+
+            // Add Unit Number to the document content
+            if (unitNumber) {
+                docContent += `<p class="unit-info">Unit Number: ${unitNumber}</p>`;
+            } else {
+                docContent += `<p class="unit-info">Unit Number: Not specified</p>`;
+            }
+
 
             selectedViolations.forEach((violation, index) => {
                 docContent += `
@@ -415,7 +432,8 @@
             // Create a temporary anchor element to trigger the download
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'Unit_Inspection_Report.doc'; // File name for download
+            // Use unit number in filename if provided, otherwise default
+            a.download = unitNumber ? `Unit_${unitNumber}_Inspection_Report.doc` : 'Unit_Inspection_Report.doc';
             document.body.appendChild(a); // Append to body (required for Firefox)
             a.click(); // Programmatically click the anchor to trigger download
             document.body.removeChild(a); // Clean up the temporary anchor
