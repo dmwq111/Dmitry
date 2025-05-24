@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Data Display</title>
+    <title>JSON Data Display (with Fetch)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom font */
@@ -24,74 +24,10 @@
     </div>
 
     <script>
-        // --- Data Source ---
-        // In a real application, you would fetch this from a URL:
-         const jsonFileUrl = 'data.json';
-        // For this example, we'll use a JSON string.
-   /*     const jsonDataString = `
-        [
-          {
-            "id": 1,
-            "name": "Alice Wonderland",
-            "username": "alicew",
-            "email": "alice.wonderland@example.com",
-            "address": {
-              "street": "123 Rabbit Hole Ln",
-              "suite": "Apt. 5",
-              "city": "Curious City",
-              "zipcode": "12345-6789"
-            },
-            "phone": "1-770-736-8031 x56442",
-            "website": "hildegard.org",
-            "company": {
-              "name": "Wonderland Enterprises",
-              "catchPhrase": "We're all mad here",
-              "bs": "harness real-time e-markets"
-            }
-          },
-          {
-            "id": 2,
-            "name": "Bob The Builder",
-            "username": "bobthebuilder",
-            "email": "bob@example.com",
-            "address": {
-              "street": "456 Construction Ave",
-              "suite": "Unit B",
-              "city": "Builderville",
-              "zipcode": "98765-4321"
-            },
-            "phone": "1-463-123-4447",
-            "website": "bobthebuilder.com",
-            "company": {
-              "name": "Bob's Constructions",
-              "catchPhrase": "Can we fix it? Yes, we can!",
-              "bs": "synergize scalable supply-chains"
-            }
-          },
-          {
-            "id": 3,
-            "name": "Charlie Brown",
-            "username": "goodgrief",
-            "email": "charlie.brown@example.com",
-            "address": {
-              "street": "789 Kite St",
-              "suite": "",
-              "city": "Peanutsville",
-              "zipcode": "54321-9876"
-            },
-            "phone": "1-245-765-3456",
-            "website": "peanuts.com",
-            "company": {
-              "name": "Peanuts Gang",
-              "catchPhrase": "Good grief!",
-              "bs": "e-enable innovative applications"
-            }
-          }
-        ]
-        
-        `;
-
-        */
+        // --- Data Source URL ---
+        // This assumes 'data.json' is in the same directory as your HTML file.
+        // Ensure you are serving these files through a web server.
+        const jsonFileUrl = 'data.json'; 
 
         // --- DOM Elements ---
         const dataContainer = document.getElementById('data-container');
@@ -114,14 +50,12 @@
                 const itemCard = document.createElement('div');
                 itemCard.className = 'bg-indigo-50 border border-indigo-200 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300';
 
-                // Display item properties
-                // You can customize this part heavily based on your JSON structure
                 let content = `<h2 class="text-xl font-semibold text-indigo-700 mb-2">${item.name || 'N/A'}</h2>`;
                 content += `<p class="text-sm text-gray-600 mb-1"><strong class="font-medium">Username:</strong> ${item.username || 'N/A'}</p>`;
                 content += `<p class="text-sm text-gray-600 mb-1"><strong class="font-medium">Email:</strong> <a href="mailto:${item.email}" class="text-blue-500 hover:underline">${item.email || 'N/A'}</a></p>`;
                 
                 if (item.address) {
-                    content += `<p class="text-sm text-gray-600 mb-1"><strong class="font-medium">Address:</strong> ${item.address.street || ''}, ${item.address.suite || ''}, ${item.address.city || ''} - ${item.address.zipcode || ''}</p>`;
+                    content += `<p class="text-sm text-gray-600 mb-1"><strong class="font-medium">Address:</strong> ${item.address.street || ''}${item.address.suite ? ', ' + item.address.suite : ''}, ${item.address.city || ''} - ${item.address.zipcode || ''}</p>`;
                 }
                 
                 content += `<p class="text-sm text-gray-600 mb-1"><strong class="font-medium">Phone:</strong> ${item.phone || 'N/A'}</p>`;
@@ -147,25 +81,23 @@
             messageArea.innerHTML = '<p class="text-blue-500">Loading data...</p>';
             
             try {
-                // Simulate a network delay (optional)
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // Fetch the JSON file
+                const response = await fetch(jsonFileUrl);
 
-                // In a real scenario, you would use fetch API:
-                // const response = await fetch(jsonFileUrl);
-                // if (!response.ok) {
-                //     throw new Error(`HTTP error! status: ${response.status}`);
-                // }
-                // const jsonData = await response.json();
+                // Check if the request was successful
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+                }
 
-                // For this example, parse the JSON string
-                const jsonData = JSON.parse(jsonDataString);
+                // Parse the JSON data from the response
+                const jsonData = await response.json();
                 
                 displayData(jsonData);
 
             } catch (error) {
                 console.error('Error loading or parsing JSON:', error);
                 dataContainer.innerHTML = ''; // Clear any partial data
-                messageArea.innerHTML = `<p class="text-red-600 font-semibold">Error loading data: ${error.message}. Please check the console for more details.</p>`;
+                messageArea.innerHTML = `<p class="text-red-600 font-semibold">Error loading data: ${error.message}. Please check the console for more details and ensure 'data.json' is accessible and correctly formatted.</p>`;
             }
         }
 
