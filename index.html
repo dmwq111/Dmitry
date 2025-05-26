@@ -14,9 +14,11 @@
         /* Custom styles for select box to allow filtering */
         .custom-select-wrapper {
             position: relative;
+            display: flex; /* Use flexbox for input and button alignment */
+            gap: 0.5rem; /* Space between input and button */
         }
         .custom-select-input {
-            width: 100%;
+            flex-grow: 1; /* Allow input to take available space */
             padding: 0.75rem 1rem;
             border: 1px solid #d1d5db; /* Gray-300 */
             border-radius: 0.5rem; /* rounded-lg */
@@ -28,7 +30,7 @@
         }
         .custom-select-dropdown {
             position: absolute;
-            width: 100%;
+            width: calc(100% - 4.5rem); /* Adjust width for button */
             max-height: 200px;
             overflow-y: auto;
             background-color: #ffffff;
@@ -37,6 +39,8 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             z-index: 10;
             display: none; /* Hidden by default */
+            top: calc(100% + 0.5rem); /* Position below the input/button row */
+            left: 0;
         }
         .custom-select-dropdown.active {
             display: block;
@@ -63,6 +67,9 @@
             <label for="violationSearch" class="block text-gray-700 text-sm font-medium mb-2">Search and Select Violation:</label>
             <div class="custom-select-wrapper">
                 <input type="text" id="violationSearch" class="custom-select-input" placeholder="Type to search violations...">
+                <button id="eraseViolationBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 shadow-sm">
+                    Erase
+                </button>
                 <div id="violationDropdown" class="custom-select-dropdown">
                     </div>
                 <select id="violationSelect" class="hidden">
@@ -173,6 +180,7 @@
         const violationSearchInput = document.getElementById('violationSearch');
         const violationDropdownDiv = document.getElementById('violationDropdown');
         const violationSelectElement = document.getElementById('violationSelect'); // The hidden select
+        const eraseViolationBtn = document.getElementById('eraseViolationBtn'); // New erase button
         const locationRadios = document.querySelectorAll('input[name="violationLocation"]');
         const shortNameDisplay = document.getElementById('shortNameDisplay');
         const violationTextDisplay = document.getElementById('violationTextDisplay');
@@ -364,6 +372,21 @@
         }
 
         /**
+         * Handles the click event for the erase button.
+         * Clears the search input, resets selected violation, and updates display.
+         */
+        function eraseSelectedViolation() {
+            violationSearchInput.value = ''; // Clear the input field
+            violationSelectElement.value = ''; // Clear the hidden select
+            selectedViolation = null; // Reset the selected violation object
+            updateCurrentSelectionDetails(); // Update displayed details to show "Please select a violation."
+            violationDropdownDiv.classList.remove('active'); // Hide the dropdown
+            // Remove 'selected' class from all options in the custom dropdown
+            Array.from(violationDropdownDiv.children).forEach(opt => opt.classList.remove('selected'));
+            alertUser("Selection erased.");
+        }
+
+        /**
          * Copies all displayed violation details to the clipboard.
          */
         function copyResultsToClipboard() {
@@ -432,7 +455,12 @@
         // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
             populateViolationsDropdown(violationsData);
-            updateCurrentSelectionDetails(); // Initialize display for current selection
+            // Do not initialize with the first violation selected by default in the input field
+            violationSearchInput.value = ''; // Ensure the input field is clear
+            violationSelectElement.value = ''; // Ensure the hidden select is clear
+            selectedViolation = null; // Ensure no violation is pre-selected
+
+            updateCurrentSelectionDetails(); // Initialize display for current selection (will show "Please select a violation.")
             renderAddedViolations(); // Initialize the added violations list
         });
 
@@ -443,10 +471,12 @@
         });
         // Hide dropdown when clicking outside
         document.addEventListener('click', (event) => {
-            if (!violationDropdownDiv.contains(event.target) && event.target !== violationSearchInput) {
+            if (!violationDropdownDiv.contains(event.target) && event.target !== violationSearchInput && event.target !== eraseViolationBtn) {
                 violationDropdownDiv.classList.remove('active');
             }
         });
+
+        eraseViolationBtn.addEventListener('click', eraseSelectedViolation); // Event listener for the new erase button
 
         locationRadios.forEach(radio => {
             radio.addEventListener('change', updateCurrentSelectionDetails);
@@ -455,18 +485,8 @@
         addViolationBtn.addEventListener('click', addSelectedViolation); // New event listener for Add button
         copyResultsBtn.addEventListener('click', copyResultsToClipboard);
 
-        // Initialize with the first violation selected by default if data exists
-        if (violationsData.length > 0) {
-            selectedViolation = violationsData[0];
-            violationSearchInput.value = selectedViolation.violationName;
-            violationSelectElement.value = selectedViolation.violationName;
-            // Mark the first option as selected in the custom dropdown
-            const firstOptionDiv = violationDropdownDiv.querySelector('.custom-select-option');
-            if (firstOptionDiv) {
-                firstOptionDiv.classList.add('selected');
-            }
-            updateCurrentSelectionDetails();
-        }
+        // The previous initialization block for default selection has been removed
+        // to prevent "Broken Window" from appearing automatically.
     </script>
 </body>
 </html>
