@@ -1,0 +1,36 @@
+[
+    {
+        "A": "Violation Name 1 (e.g., Damaged Front Bumper)",
+        "B": "DFB",
+        "C": "The front bumper is visibly damaged, requiring repair.",
+        "D": "The rear bumper is visibly damaged, requiring repair.",
+        "E": "The side panel is visibly damaged, requiring repair.",
+        "F": "Both front and rear bumpers are visibly damaged, requiring repair."
+    },
+    {
+        "A": "Violation Name 2 (e.g., Cracked Windshield)",
+        "B": "CW",
+        "C": "A significant crack is present on the front windshield.",
+        "D": "N/A (Windshield is typically front-facing).",
+        "E": "N/A (Windshield is typically front-facing).",
+        "F": "N/A (Windshield is typically front-facing)."
+    },
+    {
+        "A": "Violation Name 3 (e.g., Flat Tire)",
+        "B": "FT",
+        "C": "The front left tire is flat.",
+        "D": "The rear right tire is flat.",
+        "E": "The side tire (e.g., spare) is flat.",
+        "F": "Both front and rear tires on the left side are flat."
+    }
+    {
+        "A": "Violation Name 4 (e.g., Flat Tire)",
+        "B": "FT4",
+        "C": "The front left tire is flat.",
+        "D": "The rear right tire is flat.",
+        "E": "The side tire (e.g., spare) is flat.",
+        "F": "Both front and rear tires on the left side are flat."
+    }
+    
+    // Add all your violation entries here, following the same structure.
+]
