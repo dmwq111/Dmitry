@@ -1,4 +1,4 @@
-[
+
             {
                 violationName: "Broken Window",
                 shortName: "BW",
@@ -55,4 +55,4 @@
                 sideText: "N/A", // Not applicable for side
                 frontRearText: "N/A" // Not applicable for front and rear
             }
-        ]
+        
