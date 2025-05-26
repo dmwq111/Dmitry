@@ -46,5 +46,13 @@
                 rearText: "N/A", // Not applicable for rear
                 sideText: "N/A", // Not applicable for side
                 frontRearText: "N/A" // Not applicable for front and rear
+            },
+             {
+                violationName: "Cracked Windshield2",
+                shortName: "CW",
+                frontText: "Cracked windshield observed on the front of the unit.",
+                rearText: "N/A", // Not applicable for rear
+                sideText: "N/A", // Not applicable for side
+                frontRearText: "N/A" // Not applicable for front and rear
             }
         ]
