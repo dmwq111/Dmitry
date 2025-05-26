@@ -1,58 +1,51 @@
+[
+  {
+    "violationName": "Cracked Side Mirror",
+    "shortName": "CSM",
+    "frontText": "N/A",
+    "rearText": "N/A",
+    "sideText": "Cracked side mirror observed on the unit.",
+    "frontRearText": "N/A"
+  },
+  {
+    "violationName": "Dented Bumper",
+    "shortName": "DB",
+    "frontText": "Dented bumper observed on the front of the unit.",
+    "rearText": "Dented bumper observed on the rear of the unit.",
+    "sideText": "N/A",
+    "frontRearText": "Dented bumpers observed on the front and rear of the unit."
+  },
+  {
+    "violationName": "Faded Paint",
+    "shortName": "FP",
+    "frontText": "Faded paint observed on the front side of the unit.",
+    "rearText": "Faded paint observed on the rear side of the unit.",
+    "sideText": "Faded paint observed on the side of the unit.",
+    "frontRearText": "Faded paint observed on the front and rear sides of the unit."
+  },
+  {
+    "violationName": "Broken Headlight",
+    "shortName": "BHL",
+    "frontText": "Broken headlight observed on the front of the unit.",
+    "rearText": "N/A",
+    "sideText": "N/A",
+    "frontRearText": "N/A"
+  },
+  {
+    "violationName": "Missing License Plate",
+    "shortName": "MLP",
+    "frontText": "Missing license plate observed on the front of the unit.",
+    "rearText": "Missing license plate observed on the rear of the unit.",
+    "sideText": "N/A",
+    "frontRearText": "N/A"
+  },
+  {
+    "violationName": "Rust Spots",
+    "shortName": "RS",
+    "frontText": "Rust spots observed on the front side of the unit.",
+    "rearText": "Rust spots observed on the rear side of the unit.",
+    "sideText": "Rust spots observed on the side of the unit.",
+    "frontRearText": "Rust spots observed on the front and rear sides of the unit."
+  }
+]
 
-            {
-                violationName: "Broken Window",
-                shortName: "BW",
-                frontText: "Broken window observed on the front side of the unit.",
-                rearText: "Broken window observed on the rear side of the unit.",
-                sideText: "Broken window observed on the side of the unit.",
-                frontRearText: "Broken windows observed on the front and rear sides of the unit."
-            },
-            {
-                violationName: "Damaged Door",
-                shortName: "DD",
-                frontText: "Damaged door observed on the front side of the unit.",
-                rearText: "Damaged door observed on the rear side of the unit.",
-                sideText: "Damaged door observed on the side of the unit.",
-                frontRearText: "Damaged doors observed on the front and rear sides of the unit."
-            },
-            {
-                violationName: "Missing Panel",
-                shortName: "MP",
-                frontText: "Missing panel observed on the front side of the unit.",
-                rearText: "Missing panel observed on the rear side of the unit.",
-                sideText: "Missing panel observed on the side of the unit.",
-                frontRearText: "Missing panels observed on the front and rear sides of the unit."
-            },
-            {
-                violationName: "Graffiti",
-                shortName: "GR",
-                frontText: "Graffiti observed on the front side of the unit.",
-                rearText: "Graffiti observed on the rear side of the unit.",
-                sideText: "Graffiti observed on the side of the unit.",
-                frontRearText: "Graffiti observed on the front and rear sides of the unit."
-            },
-            {
-                violationName: "Flat Tire",
-                shortName: "FT",
-                frontText: "Flat tire observed on the front side of the unit.",
-                rearText: "Flat tire observed on the rear side of the unit.",
-                sideText: "Flat tire observed on the side of the unit.",
-                frontRearText: "Flat tires observed on the front and rear sides of the unit."
-            },
-            {
-                violationName: "Cracked Windshield",
-                shortName: "CW",
-                frontText: "Cracked windshield observed on the front of the unit.",
-                rearText: "N/A", // Not applicable for rear
-                sideText: "N/A", // Not applicable for side
-                frontRearText: "N/A" // Not applicable for front and rear
-            },
-             {
-                violationName: "Cracked Windshield2",
-                shortName: "CW",
-                frontText: "Cracked windshield observed on the front of the unit.",
-                rearText: "N/A", // Not applicable for rear
-                sideText: "N/A", // Not applicable for side
-                frontRearText: "N/A" // Not applicable for front and rear
-            }
-        
