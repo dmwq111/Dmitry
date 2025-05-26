@@ -23,5 +23,14 @@
         "E": "The side tire (e.g., spare) is flat.",
         "F": "Both front and rear tires on the left side are flat."
     }
+    {
+        "A": "Violation Name 4 (e.g., Flat Tire)",
+        "B": "FT4",
+        "C": "The front left tire is flat.",
+        "D": "The rear right tire is flat.",
+        "E": "The side tire (e.g., spare) is flat.",
+        "F": "Both front and rear tires on the left side are flat."
+    }
+    
     // Add all your violation entries here, following the same structure.
 ]
