@@ -3,320 +3,454 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unit External Inspection Form</title>
+    <title>External Unit Inspection</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles for better aesthetics and responsiveness */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Align to top to prevent content jumping */
-            min-height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
+            background-color: #f3f4f6; /* Light gray background */
         }
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        /* Custom styles for select box to allow filtering */
+        .custom-select-wrapper {
+            position: relative;
+        }
+        .custom-select-input {
             width: 100%;
-            max-width: 700px;
-            box-sizing: border-box;
-        }
-        .form-group label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        select, input[type="text"] {
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 10px 12px;
-            transition: border-color 0.2s ease-in-out;
-        }
-        select:focus, input[type="text"]:focus {
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db; /* Gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            background-color: #ffffff; /* White background */
+            font-size: 1rem;
+            line-height: 1.5rem;
             outline: none;
-            border-color: #2563eb; /* Blue focus ring */
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
         }
-        #violationDropdown {
-            max-height: 250px; /* Limit height for scrollability */
-            overflow-y: auto; /* Enable scrolling */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-        }
-        #results {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-        }
-        #copyButton {
-            background-color: #2563eb;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        #copyButton:hover {
-            background-color: #1d4ed8;
-            transform: translateY(-1px);
-        }
-        #copyButton:active {
-            background-color: #1e40af;
-            transform: translateY(0);
-        }
-        .radio-group div {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .radio-group input[type="radio"] {
-            margin-right: 8px;
-            accent-color: #2563eb; /* Custom color for radio buttons */
-        }
-        /* Custom modal for alerts */
-        .modal {
+        .custom-select-dropdown {
+            position: absolute;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 10;
             display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            justify-content: center;
-            align-items: center;
         }
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            text-align: center;
+        .custom-select-dropdown.active {
+            display: block;
         }
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
+        .custom-select-option {
+            padding: 0.75rem 1rem;
             cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .custom-select-option:hover, .custom-select-option.selected {
+            background-color: #e5e7eb; /* Gray-100 */
+        }
+        /* Hide default select element */
+        #violationSelect {
+            display: none;
         }
     </style>
 </head>
-<body>
+<body class="p-4 sm:p-6 md:p-8 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-full max-w-2xl border border-gray-200">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">External Unit Inspection Form</h1>
 
-    <div class="container">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Unit External Inspection Form</h1>
-
-        <div class="form-group mb-6">
-            <label for="violationSearch" class="block text-sm mb-2">Search Violation:</label>
-            <input type="text" id="violationSearch" onkeyup="filterViolations()" placeholder="Type to search for violations..."
-                   class="w-full text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            <select id="violationDropdown" size="10" onchange="displayViolationDetails()"
-                    class="mt-2 w-full text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </select>
-        </div>
-
-        <div class="form-group mb-6">
-            <label class="block text-sm mb-2">Location of Violation:</label>
-            <div class="radio-group">
-                <div>
-                    <input type="radio" id="locationFront" name="violationLocation" value="Front of the unit" onchange="displayViolationDetails()" class="form-radio">
-                    <label for="locationFront" class="text-gray-700">Front of the unit</label>
-                </div>
-                <div>
-                    <input type="radio" id="locationBack" name="violationLocation" value="Back of the unit" onchange="displayViolationDetails()" class="form-radio">
-                    <label for="locationBack" class="text-gray-700">Back of the unit</label>
-                </div>
-                <div>
-                    <input type="radio" id="locationSide" name="violationLocation" value="Side of the unit" onchange="displayViolationDetails()" class="form-radio">
-                    <label for="locationSide" class="text-gray-700">Side of the unit</label>
-                </div>
-                <div>
-                    <input type="radio" id="locationFrontBack" name="violationLocation" value="Front and back of the unit" onchange="displayViolationDetails()" class="form-radio">
-                    <label for="locationFrontBack" class="text-gray-700">Front and back of the unit</label>
-                </div>
+        <div class="mb-6">
+            <label for="violationSearch" class="block text-gray-700 text-sm font-medium mb-2">Search and Select Violation:</label>
+            <div class="custom-select-wrapper">
+                <input type="text" id="violationSearch" class="custom-select-input" placeholder="Type to search violations...">
+                <div id="violationDropdown" class="custom-select-dropdown">
+                    </div>
+                <select id="violationSelect" class="hidden">
+                    </select>
             </div>
         </div>
 
-        <div id="results" class="p-5">
-            <h2 class="text-xl font-semibold text-gray-800 mb-3">Inspection Details:</h2>
-            <p class="mb-2"><strong class="text-gray-700">Short Name:</strong> <span id="shortNameOutput" class="text-gray-600"></span></p>
-            <p class="mb-2"><strong class="text-gray-700">Violation Text:</strong></p>
-            <div id="violationTextOutput" class="text-gray-600 bg-white p-3 rounded-md border border-gray-200 min-h-[60px] whitespace-pre-wrap"></div>
-            <button id="copyButton" onclick="copyResults()" class="mt-4 w-full sm:w-auto flex justify-center items-center gap-2">
-                Copy Results
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2H6zM5 9a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" />
-                </svg>
-            </button>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-medium mb-2">Select Location of Violation:</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label class="flex items-center bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200">
+                    <input type="radio" name="violationLocation" value="front" class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500 rounded-full" checked>
+                    <span class="ml-2 text-gray-700">Front of the unit</span>
+                </label>
+                <label class="flex items-center bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200">
+                    <input type="radio" name="violationLocation" value="rear" class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500 rounded-full">
+                    <span class="ml-2 text-gray-700">Back of the unit</span>
+                </label>
+                <label class="flex items-center bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200">
+                    <input type="radio" name="violationLocation" value="side" class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500 rounded-full">
+                    <span class="ml-2 text-gray-700">Side of the unit</span>
+                </label>
+                <label class="flex items-center bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200">
+                    <input type="radio" name="violationLocation" value="frontRear" class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500 rounded-full">
+                    <span class="ml-2 text-gray-700">Front and back of the unit</span>
+                </label>
+            </div>
         </div>
-    </div>
 
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal()">&times;</span>
-            <p id="modalMessage" class="text-lg text-gray-800"></p>
-            <button onclick="closeModal()" class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">OK</button>
+        <div class="mb-4 bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h2 class="text-lg font-semibold text-blue-800 mb-2">Current Selection Details:</h2>
+            <p class="text-gray-800 mb-1"><span class="font-medium">Short Name:</span> <span id="shortNameDisplay" class="text-blue-700"></span></p>
+            <p class="text-gray-800"><span class="font-medium">Violation Text:</span> <span id="violationTextDisplay" class="text-blue-700"></span></p>
         </div>
+
+        <button id="addViolationBtn" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-md hover:shadow-lg mb-6">
+            Add Selected Violation
+        </button>
+
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Added Violations:</h2>
+            <div id="addedViolationsList" class="space-y-3">
+                <p id="noViolationsMessage" class="text-gray-500 text-center">No violations added yet.</p>
+            </div>
+        </div>
+
+        <button id="copyResultsBtn" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg">
+            Copy All Results to Clipboard
+        </button>
+
+        <textarea id="hiddenCopyTextarea" class="absolute -left-[9999px] h-0 w-0 p-0 m-0 opacity-0"></textarea>
     </div>
 
     <script>
-        let violationsData = []; // This will hold your JSON data
-
-        // Function to show a custom modal message instead of alert()
-        function showModal(message) {
-            document.getElementById('modalMessage').textContent = message;
-            document.getElementById('myModal').style.display = 'flex'; // Use flex to center content
-        }
-
-        // Function to close the custom modal
-        function closeModal() {
-            document.getElementById('myModal').style.display = 'none';
-        }
-
-        // Function to load JSON data from 'violations.json'
-        async function loadViolationsData() {
-            try {
-                // IMPORTANT: Ensure 'violations.json' is in the same directory as this HTML file.
-                const response = await fetch('violations.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                violationsData = await response.json();
-                populateViolationDropdown();
-            } catch (error) {
-                console.error('Error loading violations data:', error);
-                showModal('Failed to load violation data. Please ensure "violations.json" is present and correctly formatted.');
-                // Fallback data for demonstration if JSON file is not found or has issues
-                violationsData = [
-                    {"A": "Violation A - Missing light", "B": "ML", "C": "Front light is missing.", "D": "Rear light is missing.", "E": "Side light is missing.", "F": "Front and rear lights are missing."},
-                    {"A": "Violation B - Broken window", "B": "BW", "C": "Front window is broken.", "D": "Rear window is broken.", "E": "Side window is broken.", "F": "Front and rear windows are broken."},
-                    {"A": "Violation C - Dented panel", "B": "DP", "C": "Front panel is dented.", "D": "Rear panel is dented.", "E": "Side panel is dented.", "F": "Front and rear panels are dented."}
-                ];
-                populateViolationDropdown(); // Populate with fallback data if loading fails
+        // Sample JSON data for violations (replace with your actual data)
+        const violationsData = [
+            {
+                violationName: "Broken Window",
+                shortName: "BW",
+                frontText: "Broken window observed on the front side of the unit.",
+                rearText: "Broken window observed on the rear side of the unit.",
+                sideText: "Broken window observed on the side of the unit.",
+                frontRearText: "Broken windows observed on the front and rear sides of the unit."
+            },
+            {
+                violationName: "Damaged Door",
+                shortName: "DD",
+                frontText: "Damaged door observed on the front side of the unit.",
+                rearText: "Damaged door observed on the rear side of the unit.",
+                sideText: "Damaged door observed on the side of the unit.",
+                frontRearText: "Damaged doors observed on the front and rear sides of the unit."
+            },
+            {
+                violationName: "Missing Panel",
+                shortName: "MP",
+                frontText: "Missing panel observed on the front side of the unit.",
+                rearText: "Missing panel observed on the rear side of the unit.",
+                sideText: "Missing panel observed on the side of the unit.",
+                frontRearText: "Missing panels observed on the front and rear sides of the unit."
+            },
+            {
+                violationName: "Graffiti",
+                shortName: "GR",
+                frontText: "Graffiti observed on the front side of the unit.",
+                rearText: "Graffiti observed on the rear side of the unit.",
+                sideText: "Graffiti observed on the side of the unit.",
+                frontRearText: "Graffiti observed on the front and rear sides of the unit."
+            },
+            {
+                violationName: "Flat Tire",
+                shortName: "FT",
+                frontText: "Flat tire observed on the front side of the unit.",
+                rearText: "Flat tire observed on the rear side of the unit.",
+                sideText: "Flat tire observed on the side of the unit.",
+                frontRearText: "Flat tires observed on the front and rear sides of the unit."
+            },
+            {
+                violationName: "Cracked Windshield",
+                shortName: "CW",
+                frontText: "Cracked windshield observed on the front of the unit.",
+                rearText: "N/A", // Not applicable for rear
+                sideText: "N/A", // Not applicable for side
+                frontRearText: "N/A" // Not applicable for front and rear
             }
-        }
+        ];
 
-        // Function to populate the dropdown with all violations initially
-        function populateViolationDropdown() {
-            const dropdown = document.getElementById('violationDropdown');
-            dropdown.innerHTML = ''; // Clear existing options
-            violationsData.forEach(violation => {
-                const option = document.createElement('option');
-                option.value = violation.A; // Column A for value
-                option.textContent = violation.A; // Column A for display
-                dropdown.appendChild(option);
+        // Get references to HTML elements
+        const violationSearchInput = document.getElementById('violationSearch');
+        const violationDropdownDiv = document.getElementById('violationDropdown');
+        const violationSelectElement = document.getElementById('violationSelect'); // The hidden select
+        const locationRadios = document.querySelectorAll('input[name="violationLocation"]');
+        const shortNameDisplay = document.getElementById('shortNameDisplay');
+        const violationTextDisplay = document.getElementById('violationTextDisplay');
+        const addViolationBtn = document.getElementById('addViolationBtn'); // New button
+        const addedViolationsList = document.getElementById('addedViolationsList'); // Container for added violations
+        const noViolationsMessage = document.getElementById('noViolationsMessage'); // Message for empty list
+        const copyResultsBtn = document.getElementById('copyResultsBtn');
+        const hiddenCopyTextarea = document.getElementById('hiddenCopyTextarea');
+
+        let selectedViolation = null; // Stores the currently selected violation object
+        let addedViolations = []; // Array to store all added violations
+
+        /**
+         * Populates the custom dropdown and the hidden select element with violation names.
+         * @param {Array} data - The array of violation objects.
+         */
+        function populateViolationsDropdown(data) {
+            violationDropdownDiv.innerHTML = ''; // Clear previous options
+            violationSelectElement.innerHTML = ''; // Clear hidden select options
+
+            // Add a default "Select a violation" option to the hidden select
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select a violation';
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            violationSelectElement.appendChild(defaultOption);
+
+            data.forEach(violation => {
+                // Create option for custom dropdown
+                const optionDiv = document.createElement('div');
+                optionDiv.classList.add('custom-select-option', 'text-gray-800');
+                optionDiv.textContent = violation.violationName;
+                optionDiv.dataset.value = violation.violationName; // Store the full name
+                optionDiv.addEventListener('click', () => {
+                    violationSearchInput.value = violation.violationName; // Set input value
+                    violationSelectElement.value = violation.violationName; // Set hidden select value
+                    violationDropdownDiv.classList.remove('active'); // Hide dropdown
+                    selectedViolation = violation; // Store the selected violation object
+                    updateCurrentSelectionDetails(); // Update displayed details for current selection
+                    // Add 'selected' class to the clicked option
+                    Array.from(violationDropdownDiv.children).forEach(opt => opt.classList.remove('selected'));
+                    optionDiv.classList.add('selected');
+                });
+                violationDropdownDiv.appendChild(optionDiv);
+
+                // Create option for hidden select
+                const optionElement = document.createElement('option');
+                optionElement.value = violation.violationName;
+                optionElement.textContent = violation.violationName;
+                violationSelectElement.appendChild(optionElement);
             });
         }
 
-        // Function to filter violations based on search input
+        /**
+         * Filters the custom dropdown options based on the search input.
+         */
         function filterViolations() {
-            const searchInput = document.getElementById('violationSearch').value.toLowerCase();
-            const dropdown = document.getElementById('violationDropdown');
-            dropdown.innerHTML = ''; // Clear current options
+            const searchTerm = violationSearchInput.value.toLowerCase();
+            const options = violationDropdownDiv.querySelectorAll('.custom-select-option');
 
-            const filtered = violationsData.filter(violation =>
-                violation.A.toLowerCase().includes(searchInput)
-            );
-
-            filtered.forEach(violation => {
-                const option = document.createElement('option');
-                option.value = violation.A;
-                option.textContent = violation.A;
-                dropdown.appendChild(option);
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
             });
 
-            // If only one option left after filtering, auto-select it and display details
-            if (filtered.length === 1) {
-                dropdown.value = filtered[0].A;
-                displayViolationDetails();
+            // Show dropdown if there's a search term or input is focused
+            if (searchTerm.length > 0 || document.activeElement === violationSearchInput) {
+                violationDropdownDiv.classList.add('active');
             } else {
-                // Clear outputs if nothing is selected or multiple options are available
-                document.getElementById('shortNameOutput').textContent = '';
-                document.getElementById('violationTextOutput').textContent = '';
+                violationDropdownDiv.classList.remove('active');
             }
         }
 
-        // Function to display violation details when an option is selected or location changes
-        function displayViolationDetails() {
-            const selectedViolationName = document.getElementById('violationDropdown').value;
-            // Use optional chaining (?) for safe access to checked radio button value
-            const selectedLocation = document.querySelector('input[name="violationLocation"]:checked')?.value;
-
-            const selectedViolation = violationsData.find(v => v.A === selectedViolationName);
-
-            const shortNameOutput = document.getElementById('shortNameOutput');
-            const violationTextOutput = document.getElementById('violationTextOutput');
-
-            if (selectedViolation) {
-                shortNameOutput.textContent = selectedViolation.B; // Column B (Short Name)
-
-                let violationText = '';
-                if (selectedLocation === "Front of the unit") {
-                    violationText = selectedViolation.C || 'N/A: No text for front side.'; // Column C
-                } else if (selectedLocation === "Back of the unit") {
-                    violationText = selectedViolation.D || 'N/A: No text for rear side.'; // Column D
-                } else if (selectedLocation === "Side of the unit") {
-                    violationText = selectedViolation.E || 'N/A: No text for side.'; // Column E
-                } else if (selectedLocation === "Front and back of the unit") {
-                    violationText = selectedViolation.F || 'N/A: No text for front and rear sides.'; // Column F
-                } else {
-                    violationText = 'Please select a location to see the specific violation text.';
-                }
-                violationTextOutput.textContent = violationText;
-            } else {
-                shortNameOutput.textContent = '';
-                violationTextOutput.textContent = 'Please select a violation from the list.';
-            }
-        }
-
-        // Function to copy results to clipboard
-        function copyResults() {
-            const shortName = document.getElementById('shortNameOutput').textContent;
-            const violationText = document.getElementById('violationTextOutput').textContent;
-
-            if (!shortName || !violationText || violationText.includes('Please select')) {
-                showModal('Please select a violation and a location before copying results.');
+        /**
+         * Updates the displayed short name and violation text for the currently selected violation.
+         */
+        function updateCurrentSelectionDetails() {
+            if (!selectedViolation) {
+                shortNameDisplay.textContent = 'N/A';
+                violationTextDisplay.textContent = 'Please select a violation.';
                 return;
             }
 
-            const textToCopy = `Short Name: ${shortName}\nViolation Text: ${violationText}`;
+            const selectedLocation = document.querySelector('input[name="violationLocation"]:checked').value;
 
-            // Using document.execCommand('copy') for broader compatibility in iframes
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = textToCopy;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
+            shortNameDisplay.textContent = selectedViolation.shortName || 'N/A';
+
+            let violationText = '';
+            switch (selectedLocation) {
+                case 'front':
+                    violationText = selectedViolation.frontText || 'No specific text for front side.';
+                    break;
+                case 'rear':
+                    violationText = selectedViolation.rearText || 'No specific text for rear side.';
+                    break;
+                case 'side':
+                    violationText = selectedViolation.sideText || 'No specific text for side.';
+                    break;
+                case 'frontRear':
+                    violationText = selectedViolation.frontRearText || 'No specific text for front and rear sides.';
+                    break;
+                default:
+                    violationText = 'Please select a location.';
+                    break;
+            }
+            violationTextDisplay.textContent = violationText;
+        }
+
+        /**
+         * Adds the currently selected violation to the list of added violations.
+         */
+        function addSelectedViolation() {
+            if (!selectedViolation) {
+                alertUser("Please select a violation before adding.");
+                return;
+            }
+
+            const shortName = shortNameDisplay.textContent;
+            const violationText = violationTextDisplay.textContent;
+            const selectedLocation = document.querySelector('input[name="violationLocation"]:checked').value;
+
+            // Prevent adding if the text is a placeholder or N/A
+            if (violationText.includes('Please select') || violationText.includes('No specific text')) {
+                alertUser("Please ensure a valid violation and location are selected before adding.");
+                return;
+            }
+
+            const newViolation = {
+                id: Date.now(), // Unique ID for removal
+                violationName: selectedViolation.violationName,
+                shortName: shortName,
+                text: violationText,
+                location: selectedLocation
+            };
+
+            addedViolations.push(newViolation);
+            renderAddedViolations();
+            alertUser("Violation added!");
+        }
+
+        /**
+         * Renders the list of added violations in the UI.
+         */
+        function renderAddedViolations() {
+            addedViolationsList.innerHTML = ''; // Clear existing list
+
+            if (addedViolations.length === 0) {
+                noViolationsMessage.style.display = 'block';
+                return;
+            } else {
+                noViolationsMessage.style.display = 'none';
+            }
+
+            addedViolations.forEach(violation => {
+                const violationItem = document.createElement('div');
+                violationItem.classList.add('bg-gray-50', 'p-3', 'rounded-lg', 'border', 'border-gray-200', 'flex', 'flex-col', 'sm:flex-row', 'justify-between', 'items-start', 'sm:items-center', 'gap-2');
+                violationItem.innerHTML = `
+                    <div>
+                        <p class="text-gray-800 font-medium">${violation.violationName} (<span class="text-blue-700">${violation.shortName}</span>)</p>
+                        <p class="text-gray-700 text-sm">${violation.text}</p>
+                    </div>
+                    <button data-id="${violation.id}" class="remove-violation-btn bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition-colors duration-200 flex-shrink-0">Remove</button>
+                `;
+                addedViolationsList.appendChild(violationItem);
+            });
+
+            // Add event listeners for remove buttons
+            document.querySelectorAll('.remove-violation-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const idToRemove = parseInt(event.target.dataset.id);
+                    removeViolation(idToRemove);
+                });
+            });
+        }
+
+        /**
+         * Removes a violation from the addedViolations array and re-renders the list.
+         * @param {number} id - The unique ID of the violation to remove.
+         */
+        function removeViolation(id) {
+            addedViolations = addedViolations.filter(violation => violation.id !== id);
+            renderAddedViolations();
+            alertUser("Violation removed.");
+        }
+
+        /**
+         * Copies all displayed violation details to the clipboard.
+         */
+        function copyResultsToClipboard() {
+            if (addedViolations.length === 0) {
+                alertUser("No violations to copy.");
+                return;
+            }
+
+            let textToCopy = "--- External Unit Inspection Report ---\n\n";
+            addedViolations.forEach((violation, index) => {
+                textToCopy += `Violation ${index + 1}:\n`;
+                textToCopy += `  Name: ${violation.violationName}\n`;
+                textToCopy += `  Short Name: ${violation.shortName}\n`;
+                textToCopy += `  Location: ${violation.location.charAt(0).toUpperCase() + violation.location.slice(1)}\n`; // Capitalize first letter
+                textToCopy += `  Details: ${violation.text}\n\n`;
+            });
+            textToCopy += "--- End of Report ---";
+
+            // Ensure the textarea is focused before selecting
+            hiddenCopyTextarea.value = textToCopy;
+            hiddenCopyTextarea.focus();
+            hiddenCopyTextarea.select();
+
             try {
-                document.execCommand('copy');
-                showModal('Results copied to clipboard!');
+                const successful = document.execCommand('copy');
+                const msg = successful ? 'All violations copied to clipboard!' : 'Failed to copy all violations.';
+                alertUser(msg);
             } catch (err) {
-                console.error('Failed to copy: ', err);
-                showModal('Failed to copy results. Please try again or copy manually.');
-            } finally {
-                document.body.removeChild(tempTextArea);
+                alertUser('Error copying to clipboard: ' + err);
             }
         }
 
-        // Load data when the page loads
-        window.onload = loadViolationsData;
-    </script>
+        /**
+         * Displays a simple alert message to the user.
+         * @param {string} message - The message to display.
+         */
+        function alertUser(message) {
+            // Using a simple modal-like div for alerts instead of alert()
+            const alertDiv = document.createElement('div');
+            alertDiv.classList.add('fixed', 'top-4', 'right-4', 'bg-blue-500', 'text-white', 'py-2', 'px-4', 'rounded-lg', 'shadow-lg', 'z-50', 'transition-opacity', 'duration-300');
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
 
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                alertDiv.addEventListener('transitionend', () => alertDiv.remove());
+            }, 3000); // Remove after 3 seconds
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            populateViolationsDropdown(violationsData);
+            updateCurrentSelectionDetails(); // Initialize display for current selection
+            renderAddedViolations(); // Initialize the added violations list
+        });
+
+        violationSearchInput.addEventListener('input', filterViolations);
+        violationSearchInput.addEventListener('focus', () => {
+            filterViolations(); // Show dropdown on focus
+            violationDropdownDiv.classList.add('active');
+        });
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!violationDropdownDiv.contains(event.target) && event.target !== violationSearchInput) {
+                violationDropdownDiv.classList.remove('active');
+            }
+        });
+
+        locationRadios.forEach(radio => {
+            radio.addEventListener('change', updateCurrentSelectionDetails);
+        });
+
+        addViolationBtn.addEventListener('click', addSelectedViolation); // New event listener for Add button
+        copyResultsBtn.addEventListener('click', copyResultsToClipboard);
+
+        // Initialize with the first violation selected by default if data exists
+        if (violationsData.length > 0) {
+            selectedViolation = violationsData[0];
+            violationSearchInput.value = selectedViolation.violationName;
+            violationSelectElement.value = selectedViolation.violationName;
+            // Mark the first option as selected in the custom dropdown
+            const firstOptionDiv = violationDropdownDiv.querySelector('.custom-select-option');
+            if (firstOptionDiv) {
+                firstOptionDiv.classList.add('selected');
+            }
+            updateCurrentSelectionDetails();
+        }
+    </script>
 </body>
 </html>
