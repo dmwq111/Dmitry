@@ -382,8 +382,16 @@
             });
             textToCopy += "--- End of Report ---";
 
-            // Ensure the textarea is focused before selecting
             hiddenCopyTextarea.value = textToCopy;
+
+            // Temporarily make the textarea visible and focusable, then select and copy
+            hiddenCopyTextarea.style.position = 'absolute';
+            hiddenCopyTextarea.style.left = '0';
+            hiddenCopyTextarea.style.top = '0';
+            hiddenCopyTextarea.style.width = '1px';
+            hiddenCopyTextarea.style.height = '1px';
+            hiddenCopyTextarea.style.opacity = '0.01'; // Make it almost invisible but still interactable
+
             hiddenCopyTextarea.focus();
             hiddenCopyTextarea.select();
 
@@ -393,6 +401,14 @@
                 alertUser(msg);
             } catch (err) {
                 alertUser('Error copying to clipboard: ' + err);
+            } finally {
+                // Reset styles to original hidden state
+                hiddenCopyTextarea.style.position = 'absolute';
+                hiddenCopyTextarea.style.left = '-9999px';
+                hiddenCopyTextarea.style.top = '';
+                hiddenCopyTextarea.style.width = '';
+                hiddenCopyTextarea.style.height = '';
+                hiddenCopyTextarea.style.opacity = '0';
             }
         }
 
