@@ -3,280 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>House Inspection Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <title>Unit External Inspection Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Custom styles for better aesthetics and responsiveness */
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top to prevent content jumping */
+            min-height: 100vh;
             padding: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"],
-        input[type="date"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
             box-sizing: border-box;
         }
-        textarea {
-            height: 100px;
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            box-sizing: border-box;
         }
-        .section {
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .section-title {
-            margin-top: 0;
+        .form-group label {
+            font-weight: 600;
             color: #333;
+            margin-bottom: 8px;
         }
-        button {
-            background-color: #4CAF50;
+        select, input[type="text"] {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px 12px;
+            transition: border-color 0.2s ease-in-out;
+        }
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #2563eb; /* Blue focus ring */
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        #violationDropdown {
+            max-height: 250px; /* Limit height for scrollability */
+            overflow-y: auto; /* Enable scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+        #results {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        #copyButton {
+            background-color: #2563eb;
             color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        button:hover {
-            background-color: #45a049;
+        #copyButton:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
         }
-        .violation-item {
-            background-color: #fff;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
+        #copyButton:active {
+            background-color: #1e40af;
+            transform: translateY(0);
         }
-        .violation-text {
-            flex: 1;
-            min-width: 200px;
-        }
-        .violation-location {
-            flex: 1;
-            min-width: 150px;
-        }
-        .remove-violation {
-            color: red;
-            cursor: pointer;
-            padding: 5px;
-        }
-        .location-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 5px;
-        }
-        .location-option {
+        .radio-group div {
             display: flex;
             align-items: center;
+            margin-bottom: 8px;
         }
-        .location-option input {
-            margin-right: 5px;
+        .radio-group input[type="radio"] {
+            margin-right: 8px;
+            accent-color: #2563eb; /* Custom color for radio buttons */
+        }
+        /* Custom modal for alerts */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>House Inspection Form</h1>
-    <form id="inspectionForm">
-        <div class="section">
-            <h2 class="section-title">Property Information</h2>
-            <div class="form-group">
-                <label for="propertyAddress">Property Address</label>
-                <input type="text" id="propertyAddress" name="propertyAddress" required>
-            </div>
-            <div class="form-group">
-                <label for="ownerName">Owner Name</label>
-                <input type="text" id="ownerName" name="ownerName">
-            </div>
-            <div class="form-group">
-                <label for="inspectionDate">Inspection Date</label>
-                <input type="date" id="inspectionDate" name="inspectionDate" required>
-            </div>
-            <div class="form-group">
-                <label for="inspectorName">Inspector Name</label>
-                <input type="text" id="inspectorName" name="inspectorName" required>
-            </div>
+
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Unit External Inspection Form</h1>
+
+        <div class="form-group mb-6">
+            <label for="violationSearch" class="block text-sm mb-2">Search Violation:</label>
+            <input type="text" id="violationSearch" onkeyup="filterViolations()" placeholder="Type to search for violations..."
+                   class="w-full text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <select id="violationDropdown" size="10" onchange="displayViolationDetails()"
+                    class="mt-2 w-full text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </select>
         </div>
 
-        <div class="section">
-            <h2 class="section-title">Inspection Details</h2>
-            <div class="form-group">
-                <label for="violations">Add Violation</label>
-                <select id="violations" class="violation-select" style="width: 100%">
-                    <option value=""></option>
-                    <option value="Structural damage">Structural damage</option>
-                    <option value="Roof leaks or damage">Roof leaks or damage</option>
-                    <option value="Faulty electrical wiring">Faulty electrical wiring</option>
-                    <option value="Plumbing leaks">Plumbing leaks</option>
-                    <option value="Mold growth">Mold growth</option>
-                    <option value="Pest infestation">Pest infestation</option>
-                    <option value="Broken windows">Broken windows</option>
-                    <option value="Non-functioning HVAC">Non-functioning HVAC</option>
-                    <option value="Missing smoke detectors">Missing smoke detectors</option>
-                    <option value="Missing carbon monoxide detectors">Missing carbon monoxide detectors</option>
-                    <option value="Peeling lead paint">Peeling lead paint</option>
-                    <option value="Inadequate ventilation">Inadequate ventilation</option>
-                    <option value="Blocked emergency exits">Blocked emergency exits</option>
-                    <option value="Unsafe stairs or railings">Unsafe stairs or railings</option>
-                    <option value="Water damage">Water damage</option>
-                    <option value="Foundation cracks">Foundation cracks</option>
-                    <option value="Improper waste disposal">Improper waste disposal</option>
-                    <option value="Overgrown vegetation">Overgrown vegetation</option>
-                    <option value="Broken or missing handrails">Broken or missing handrails</option>
-                    <option value="Inoperable appliances">Inoperable appliances</option>
-                    <option value="Other (specify in notes)">Other (specify in notes)</option>
-                </select>
-            </div>
-            
-            <div class="form-group" id="locationSelection" style="display: none;">
-                <label>Select Location(s) of Violation:</label>
-                <div class="location-options">
-                    <div class="location-option">
-                        <input type="checkbox" id="frontLocation" name="location" value="Front of the unit">
-                        <label for="frontLocation">Front of the unit</label>
-                    </div>
-                    <div class="location-option">
-                        <input type="checkbox" id="backLocation" name="location" value="Back of the unit">
-                        <label for="backLocation">Back of the unit</label>
-                    </div>
-                    <div class="location-option">
-                        <input type="checkbox" id="sideLocation" name="location" value="Side of the unit">
-                        <label for="sideLocation">Side of the unit</label>
-                    </div>
-                    <div class="location-option">
-                        <input type="checkbox" id="interiorLocation" name="location" value="Interior">
-                        <label for="interiorLocation">Interior</label>
-                    </div>
-                    <div class="location-option">
-                        <input type="checkbox" id="roofLocation" name="location" value="Roof">
-                        <label for="roofLocation">Roof</label>
-                    </div>
-                    <div class="location-option">
-                        <input type="checkbox" id="basementLocation" name="location" value="Basement">
-                        <label for="basementLocation">Basement</label>
-                    </div>
+        <div class="form-group mb-6">
+            <label class="block text-sm mb-2">Location of Violation:</label>
+            <div class="radio-group">
+                <div>
+                    <input type="radio" id="locationFront" name="violationLocation" value="Front of the unit" onchange="displayViolationDetails()" class="form-radio">
+                    <label for="locationFront" class="text-gray-700">Front of the unit</label>
                 </div>
-                <button type="button" id="addViolationBtn" style="margin-top: 10px;">Add Violation with Location</button>
-            </div>
-            
-            <div id="violationsList">
-                <!-- Violations will be added here -->
-            </div>
-            
-            <div class="form-group">
-                <label for="violationNotes">Violation Notes</label>
-                <textarea id="violationNotes" name="violationNotes" placeholder="Add details about violations found..."></textarea>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">Inspection Results</h2>
-            <div class="form-group">
-                <label for="inspectionResult">Overall Inspection Result</label>
-                <select id="inspectionResult" name="inspectionResult" required>
-                    <option value="">Select result</option>
-                    <option value="Passed">Passed</option>
-                    <option value="Failed">Failed</option>
-                    <option value="Conditional Pass">Conditional Pass</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="followUpDate">Follow-up Date (if applicable)</label>
-                <input type="date" id="followUpDate" name="followUpDate">
-            </div>
-            <div class="form-group">
-                <label for="additionalNotes">Additional Notes</label>
-                <textarea id="additionalNotes" name="additionalNotes" placeholder="Add any additional notes about the inspection..."></textarea>
+                <div>
+                    <input type="radio" id="locationBack" name="violationLocation" value="Back of the unit" onchange="displayViolationDetails()" class="form-radio">
+                    <label for="locationBack" class="text-gray-700">Back of the unit</label>
+                </div>
+                <div>
+                    <input type="radio" id="locationSide" name="violationLocation" value="Side of the unit" onchange="displayViolationDetails()" class="form-radio">
+                    <label for="locationSide" class="text-gray-700">Side of the unit</label>
+                </div>
+                <div>
+                    <input type="radio" id="locationFrontBack" name="violationLocation" value="Front and back of the unit" onchange="displayViolationDetails()" class="form-radio">
+                    <label for="locationFrontBack" class="text-gray-700">Front and back of the unit</label>
+                </div>
             </div>
         </div>
 
-        <button type="submit">Submit Inspection Report</button>
-    </form>
+        <div id="results" class="p-5">
+            <h2 class="text-xl font-semibold text-gray-800 mb-3">Inspection Details:</h2>
+            <p class="mb-2"><strong class="text-gray-700">Short Name:</strong> <span id="shortNameOutput" class="text-gray-600"></span></p>
+            <p class="mb-2"><strong class="text-gray-700">Violation Text:</strong></p>
+            <div id="violationTextOutput" class="text-gray-600 bg-white p-3 rounded-md border border-gray-200 min-h-[60px] whitespace-pre-wrap"></div>
+            <button id="copyButton" onclick="copyResults()" class="mt-4 w-full sm:w-auto flex justify-center items-center gap-2">
+                Copy Results
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2H6zM5 9a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" />
+                </svg>
+            </button>
+        </div>
+    </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <p id="modalMessage" class="text-lg text-gray-800"></p>
+            <button onclick="closeModal()" class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">OK</button>
+        </div>
+    </div>
+
     <script>
-        $(document).ready(function() {
-            // Initialize select2 for the violations dropdown
-            $('.violation-select').select2({
-                placeholder: "Search or select a violation",
-                allowClear: true
-            });
+        let violationsData = []; // This will hold your JSON data
 
-            // Show location selection when a violation is chosen
-            $('#violations').on('change', function() {
-                const violation = $(this).val();
-                if (violation) {
-                    $('#locationSelection').show();
-                } else {
-                    $('#locationSelection').hide();
+        // Function to show a custom modal message instead of alert()
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('myModal').style.display = 'flex'; // Use flex to center content
+        }
+
+        // Function to close the custom modal
+        function closeModal() {
+            document.getElementById('myModal').style.display = 'none';
+        }
+
+        // Function to load JSON data from 'violations.json'
+        async function loadViolationsData() {
+            try {
+                // IMPORTANT: Ensure 'violations.json' is in the same directory as this HTML file.
+                const response = await fetch('violations.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                violationsData = await response.json();
+                populateViolationDropdown();
+            } catch (error) {
+                console.error('Error loading violations data:', error);
+                showModal('Failed to load violation data. Please ensure "violations.json" is present and correctly formatted.');
+                // Fallback data for demonstration if JSON file is not found or has issues
+                violationsData = [
+                    {"A": "Violation A - Missing light", "B": "ML", "C": "Front light is missing.", "D": "Rear light is missing.", "E": "Side light is missing.", "F": "Front and rear lights are missing."},
+                    {"A": "Violation B - Broken window", "B": "BW", "C": "Front window is broken.", "D": "Rear window is broken.", "E": "Side window is broken.", "F": "Front and rear windows are broken."},
+                    {"A": "Violation C - Dented panel", "B": "DP", "C": "Front panel is dented.", "D": "Rear panel is dented.", "E": "Side panel is dented.", "F": "Front and rear panels are dented."}
+                ];
+                populateViolationDropdown(); // Populate with fallback data if loading fails
+            }
+        }
+
+        // Function to populate the dropdown with all violations initially
+        function populateViolationDropdown() {
+            const dropdown = document.getElementById('violationDropdown');
+            dropdown.innerHTML = ''; // Clear existing options
+            violationsData.forEach(violation => {
+                const option = document.createElement('option');
+                option.value = violation.A; // Column A for value
+                option.textContent = violation.A; // Column A for display
+                dropdown.appendChild(option);
+            });
+        }
+
+        // Function to filter violations based on search input
+        function filterViolations() {
+            const searchInput = document.getElementById('violationSearch').value.toLowerCase();
+            const dropdown = document.getElementById('violationDropdown');
+            dropdown.innerHTML = ''; // Clear current options
+
+            const filtered = violationsData.filter(violation =>
+                violation.A.toLowerCase().includes(searchInput)
+            );
+
+            filtered.forEach(violation => {
+                const option = document.createElement('option');
+                option.value = violation.A;
+                option.textContent = violation.A;
+                dropdown.appendChild(option);
             });
 
-            // Add violation to the list with locations
-            $('#addViolationBtn').on('click', function() {
-                const violation = $('#violations').val();
-                const selectedLocations = [];
-                
-                $('input[name="location"]:checked').each(function() {
-                    selectedLocations.push($(this).val());
-                });
-                
-                if (violation && selectedLocations.length > 0) {
-                    const locationsText = selectedLocations.join(', ');
-                    
-                    $('#violationsList').append(`
-                        <div class="violation-item">
-                            <div class="violation-text">${violation}</div>
-                            <div class="violation-location">Location: ${locationsText}</div>
-                            <span class="remove-violation">×</span>
-                            <input type="hidden" name="selectedViolations[]" value="${violation}">
-                            <input type="hidden" name="violationLocations[]" value="${locationsText}">
-                        </div>
-                    `);
-                    
-                    // Reset the form
-                    $('#violations').val(null).trigger('change');
-                    $('input[name="location"]').prop('checked', false);
-                    $('#locationSelection').hide();
+            // If only one option left after filtering, auto-select it and display details
+            if (filtered.length === 1) {
+                dropdown.value = filtered[0].A;
+                displayViolationDetails();
+            } else {
+                // Clear outputs if nothing is selected or multiple options are available
+                document.getElementById('shortNameOutput').textContent = '';
+                document.getElementById('violationTextOutput').textContent = '';
+            }
+        }
+
+        // Function to display violation details when an option is selected or location changes
+        function displayViolationDetails() {
+            const selectedViolationName = document.getElementById('violationDropdown').value;
+            // Use optional chaining (?) for safe access to checked radio button value
+            const selectedLocation = document.querySelector('input[name="violationLocation"]:checked')?.value;
+
+            const selectedViolation = violationsData.find(v => v.A === selectedViolationName);
+
+            const shortNameOutput = document.getElementById('shortNameOutput');
+            const violationTextOutput = document.getElementById('violationTextOutput');
+
+            if (selectedViolation) {
+                shortNameOutput.textContent = selectedViolation.B; // Column B (Short Name)
+
+                let violationText = '';
+                if (selectedLocation === "Front of the unit") {
+                    violationText = selectedViolation.C || 'N/A: No text for front side.'; // Column C
+                } else if (selectedLocation === "Back of the unit") {
+                    violationText = selectedViolation.D || 'N/A: No text for rear side.'; // Column D
+                } else if (selectedLocation === "Side of the unit") {
+                    violationText = selectedViolation.E || 'N/A: No text for side.'; // Column E
+                } else if (selectedLocation === "Front and back of the unit") {
+                    violationText = selectedViolation.F || 'N/A: No text for front and rear sides.'; // Column F
                 } else {
-                    alert('Please select at least one location for the violation.');
+                    violationText = 'Please select a location to see the specific violation text.';
                 }
-            });
+                violationTextOutput.textContent = violationText;
+            } else {
+                shortNameOutput.textContent = '';
+                violationTextOutput.textContent = 'Please select a violation from the list.';
+            }
+        }
 
-            // Remove violation from the list
-            $(document).on('click', '.remove-violation', function() {
-                $(this).parent().remove();
-            });
+        // Function to copy results to clipboard
+        function copyResults() {
+            const shortName = document.getElementById('shortNameOutput').textContent;
+            const violationText = document.getElementById('violationTextOutput').textContent;
 
-            // Form submission
-            $('#inspectionForm').on('submit', function(e) {
-                e.preventDefault();
-                alert('Inspection form submitted successfully!');
-                // Here you would typically send the form data to a server
-                // this.submit();
-            });
-        });
+            if (!shortName || !violationText || violationText.includes('Please select')) {
+                showModal('Please select a violation and a location before copying results.');
+                return;
+            }
+
+            const textToCopy = `Short Name: ${shortName}\nViolation Text: ${violationText}`;
+
+            // Using document.execCommand('copy') for broader compatibility in iframes
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                showModal('Results copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                showModal('Failed to copy results. Please try again or copy manually.');
+            } finally {
+                document.body.removeChild(tempTextArea);
+            }
+        }
+
+        // Load data when the page loads
+        window.onload = loadViolationsData;
     </script>
+
 </body>
 </html>
